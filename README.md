@@ -1,44 +1,49 @@
-# Hotel Revenue Decision-Support System
+# Hotel Revenue Decision Support System
 
 **Peace Ojehanon** · Glasgow, UK · [LinkedIn](https://www.linkedin.com/in/peace-ojehanon) · peaceojehanon5@gmail.com
 
-A full-stack web application that helps a hotel make pricing and staffing
-decisions by putting revenue, bookings, maintenance costs and staff salary
-against each other on one dashboard. Built as my **BSc Computer Science
-final-year project (Babcock University, 2018)** and preserved here, with the
-security-critical code modernised for public hosting (see *Security* below).
+My **BSc Computer Science final-year project (Babcock University, 2018)**,
+built by a group of three that I led. It is a PHP and MySQL web app for hotel
+revenue management: staff record bookings, damages, expenses and staff issues,
+and the manager's dashboard pairs each chart with a suggested decision, such
+as the price each room type should go for based on monthly bookings. The
+project was graded A.
 
-The dashboard answers questions a duty manager actually asks: *are we making
-more than we're spending each month? which room type is filling up? where is
-the maintenance budget going? who's logging the most issues?*
+My part was leading the group, editing and reviewing the report, helping with
+the coding, and doing the final code review before our presentation. The app
+ran locally on XAMPP. It was never used by a real hotel, and the data behind
+the charts is randomly generated.
 
 ## What it does
 
-- **Role-based access** — three account types: records clerk (`R`), manager
-  (`M`) and admin (`A`), each landing on the screens relevant to them.
-- **Bookings & rooms** — record bookings against room types and rates.
-- **Revenue vs. cost** — a monthly line chart comparing booking revenue with
-  total salary cost for a chosen year.
-- **Occupancy** — bookings per room type, by month.
-- **Maintenance** — damage/expense logging with a cost-per-month view.
-- **Issues** — a per-staff breakdown of logged issues.
+- **Three user roles.** Records clerk (`R`), manager (`M`) and admin (`A`), each
+  taken to the screens relevant to them after signing in.
+- **Records.** Forms for bookings, damages, expenses and staff issues, saved to
+  a MySQL database.
+- **Manager dashboard.** Charts of the recorded data, each with a suggested
+  decision beside it.
 
 ## Stack
 
-PHP · MySQL · JavaScript · Bootstrap · Chart.js. No framework — plain PHP with
-a small `core/` layer for connection, auth and the chart endpoints.
+PHP · MySQL · HTML, CSS and JavaScript · a Bootstrap admin template · jQuery ·
+Chart.js. No framework: plain PHP, with a small `core/` folder for the database
+connection, sign-in and the chart endpoints.
 
 ## Run it locally
 
-1. Install [XAMPP](https://www.apachefriends.org/) (or any PHP + MySQL stack)
+1. Install [XAMPP](https://www.apachefriends.org/) (or any PHP and MySQL stack)
    and start Apache and MySQL.
-2. Create a database called `dss_db` and import `dss_db.sql` into it
-   (e.g. via phpMyAdmin at `localhost/phpmyadmin`).
-3. Copy this folder into your web root (XAMPP: `htdocs/hotel-revenue-dss`).
-4. Set your database credentials — copy `.env.example` to `.env` and edit, or
-   export `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` in your environment.
-   The defaults match a stock XAMPP install (`root`, no password).
-5. Visit `http://localhost/hotel-revenue-dss/` and sign in.
+2. Download this repo and unzip `hotel-revenue-dss.zip`. The zip holds the
+   complete app. The files at the top level of this repo are only the page
+   scripts, without the `core/` folder and the front-end assets they need.
+3. Create a database called `dss_db` and import `dss_db.sql` into it
+   (for example through phpMyAdmin at `localhost/phpmyadmin`).
+4. Copy the unzipped `hotel-revenue-dss` folder into your web root (XAMPP:
+   `htdocs/hotel-revenue-dss`).
+5. The database settings default to a stock XAMPP install (`root`, no
+   password). If yours differ, set `DB_HOST`, `DB_USER`, `DB_PASSWORD` and
+   `DB_NAME` as environment variables (`.env.example` lists them).
+6. Visit `http://localhost/hotel-revenue-dss/` and sign in.
 
 ### Demo accounts
 
@@ -52,37 +57,37 @@ The seed data creates three demo accounts, all with the password `demo1234`:
 
 Change these before putting anything real behind the app.
 
-## Security
+## What changed for publishing (June 2026)
 
-This is preserved 2018 student code, so I've been explicit about what was
-changed for publication rather than pretending it shipped this way:
+The code is the 2018 project, with these changes made in June 2026 before
+putting it online:
 
-**Hardened (in `core/`):**
-- All database access uses **prepared statements** — the original interpolated
-  `$_GET`/`$_POST` straight into SQL, including a `DELETE FROM users` reachable
-  by a simple GET link.
-- That delete is now **POST-only and restricted to an authenticated manager**,
-  and every chart endpoint checks the session before returning data.
+- Sign-in, registration and the chart endpoints (`core/login.php`,
+  `core/register.php` and `core/control.php`) use **prepared statements**. The
+  2018 versions built SQL from `$_GET` and `$_POST` values, including a
+  `DELETE FROM users` reachable from a plain link.
+- That delete is now **POST only and limited to a signed-in manager**, and the
+  chart endpoints check the session before returning data.
 - Passwords are stored with **`password_hash()` (bcrypt)** and checked with
-  `password_verify()`; any legacy md5 record is upgraded on next login. The
-  original used bare md5.
-- Database credentials come from the **environment**, not committed source.
-- Connection errors are logged server-side instead of echoed to the page.
+  `password_verify()`; an old md5 hash is upgraded at the next sign-in. The
+  2018 version used plain md5.
+- Database credentials come from **environment variables**, not the source.
+- Connection errors are logged on the server instead of shown on the page.
 
-**Preserved as-is:** the page-level scripts (`bookings.php`, `expense.php`,
-etc.) are the original coursework and still follow the older patterns. The
-hardened `core/` shows how I'd write the data layer today; the front-end pages
-are kept for honesty about where the project started. Treat this as a learning
-artefact, not production software.
+Everything else is unchanged from 2018. In particular, `core/controller.php`
+(which saves the bookings, damages, expenses and issues forms) and
+`core/admin.php` (the admin sign-in) still build SQL straight from form values.
+Treat this as a student project, not production software.
 
 ## Layout
 
 ```
-index.php          login screen
-home.php            manager dashboard (charts)
-bookings.php …      records/clerk screens
-admin.php           admin panel
-core/               connection, auth (login/register), chart endpoints  ← hardened
-dss_db.sql          schema + demo seed data
-css/ js/ img/ fonts/ vendors/   front-end assets (Bootstrap, Chart.js)
+index.php            sign-in screen
+home.php             manager dashboard (charts and suggested decisions)
+bookings.php, damage.php, expense.php, issue.php    records screens
+admin.php            admin panel
+dss_db.sql           schema, randomly generated sample data and demo accounts
+hotel-revenue-dss.zip    the complete app, including:
+  core/              database connection, sign-in, registration, chart endpoints
+  css/ js/ img/ fonts/ vendors/    front-end assets (Bootstrap template, Chart.js)
 ```
