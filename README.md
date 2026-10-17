@@ -33,17 +33,13 @@ connection, sign-in and the chart endpoints.
 
 1. Install [XAMPP](https://www.apachefriends.org/) (or any PHP and MySQL stack)
    and start Apache and MySQL.
-2. Download this repo and unzip `hotel-revenue-dss.zip`. The zip holds the
-   complete app. The files at the top level of this repo are only the page
-   scripts, without the `core/` folder and the front-end assets they need.
-3. Create a database called `dss_db` and import `dss_db.sql` into it
+2. Create a database called `dss_db` and import `dss_db.sql` into it
    (for example through phpMyAdmin at `localhost/phpmyadmin`).
-4. Copy the unzipped `hotel-revenue-dss` folder into your web root (XAMPP:
-   `htdocs/hotel-revenue-dss`).
-5. The database settings default to a stock XAMPP install (`root`, no
+3. Copy this repo into your web root (XAMPP: `htdocs/hotel-revenue-dss`).
+4. The database settings default to a stock XAMPP install (`root`, no
    password). If yours differ, set `DB_HOST`, `DB_USER`, `DB_PASSWORD` and
    `DB_NAME` as environment variables (`.env.example` lists them).
-6. Visit `http://localhost/hotel-revenue-dss/` and sign in.
+5. Visit `http://localhost/hotel-revenue-dss/` and sign in.
 
 ### Demo accounts
 
@@ -77,17 +73,20 @@ putting it online:
 Everything else is unchanged from 2018. In particular, `core/controller.php`
 (which saves the bookings, damages, expenses and issues forms) and
 `core/admin.php` (the admin sign-in) still build SQL straight from form values.
-Treat this as a student project, not production software.
+One side effect: the Delete link on the admin's user page (`index.php`, through
+`js/dss/app.js`) still sends a GET request, and the delete now only accepts a
+manager, so the link no longer deletes anyone. Treat this as a student project,
+not production software.
 
 ## Layout
 
 ```
-index.php            sign-in screen
+login.php            sign-in screen for staff and the manager
+admin.php            sign-in screen for the admin
+index.php            admin's user page (add and delete users)
 home.php             manager dashboard (charts and suggested decisions)
 bookings.php, damage.php, expense.php, issue.php    records screens
-admin.php            admin panel
+core/                database connection, sign-in, registration, chart endpoints
 dss_db.sql           schema, randomly generated sample data and demo accounts
-hotel-revenue-dss.zip    the complete app, including:
-  core/              database connection, sign-in, registration, chart endpoints
-  css/ js/ img/ fonts/ vendors/    front-end assets (Bootstrap template, Chart.js)
+css/ js/ img/ fonts/ vendors/    front-end assets (Bootstrap template, Chart.js)
 ```
